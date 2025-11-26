@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>寶可夢時鐘大亂鬥：全員出擊版</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* 遊戲主容器 */
+        #game-container {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 95%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            transition: background 0.5s;
+        }
+
+        /* --- 選角畫面調整 (改為 2x2 網格) --- */
+        .char-select-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .char-btn {
+            padding: 10px; border: 4px solid #ddd; border-radius: 20px; 
+            background: white; cursor: pointer; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center;
+            width: auto; /* 自動寬度 */
+        }
+        .char-btn img { width: 70px; height: 70px; object-fit: contain; }
+        .char-btn b { font-size: 1.1rem; margin-top: 5px; }
+        .char-btn:active { transform: scale(0.95); }
+
+        /* 角色主題色 */
+        .theme-snorlax { border-color: #4682B4; background: #E3F2FD; color: #0D47A1; }
+        .theme-mew { border-color: #FF69B4; background: #FCE4EC; color: #C2185B; }
+        .theme-pikachu { border-color: #FFD700; background: #FFFACD; color: #9A8C00; }
+        .theme-eevee { border-color: #A0522D; background: #FAF0E6; color: #8B4513; }
+
+
+        /* --- 戰鬥場景 --- */
+        .battle-scene {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 180px;
+            padding: 0 5px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .character-wrapper {
+            position: relative;
+            width: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .poke-img {
+            width: 110px; height: 110px; object-fit: contain; z-index: 2; transition: transform 0.1s;
+        }
+
+        .player-flip { transform: scaleX(-1); }
+
+        /* 血條 */
+        .hp-bar-frame {
+            width: 100%; height: 14px; background: #333; border-radius: 7px;
+            border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            overflow: hidden; margin-bottom: 5px; position: relative; z-index: 5;
+        }
+        .hp-fill {
+            height: 100%; background: linear-gradient(90deg, #4caf50, #8bc34a);
+            width: 100%; transition: width 0.4s ease-out;
+        }
+        .hp-text {
+            font-size: 0.9rem; font-weight: bold; color: #555; margin-bottom: 2px;
+        }
+
+        /* 光環與特效 */
+        .aura-snorlax { filter: drop-shadow(0 0 8px #2196F3); }
+        .aura-mew { filter: drop-shadow(0 0 8px #E91E63); }
+        .aura-pikachu { filter: drop-shadow(0 0 8px #FFD700); }
+        .aura-eevee { filter: drop-shadow(0 0 8px #A0522D); }
+        .aura-psyduck { filter: drop-shadow(0 0 8px #FFC107); }
+        .filter-hurt { filter: sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.8); }
+
+        /* --- 動畫 Class --- */
+        .anim-lunge-right { animation: lungeRight 0.3s ease-in-out; }
+        @keyframes lungeRight {
+            0% { transform: scaleX(-1) translateX(0); }
+            50% { transform: scaleX(-1) translateX(-40px); }
+            100% { transform: scaleX(-1) translateX(0); }
+        }
+        .anim-lunge-left { animation: lungeLeft 0.3s ease-in-out; }
+        @keyframes lungeLeft {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-40px); }
+            100% { transform: translateX(0); }
+        }
+        .anim-hit { animation: hitShake 0.4s ease-in-out; }
+        @keyframes hitShake {
+            0% { transform: translate(0, 0) rotate(0); }
+            20% { transform: translate(-5px, 5px) rotate(-5deg); }
+            40% { transform: translate(5px, -5px) rotate(5deg); }
+            60% { transform: translate(-5px, 0px) rotate(-5deg); }
+            80% { transform: translate(5px, 0px) rotate(5deg); }
+            100% { transform: translate(0, 0) rotate(0); }
+        }
+        .projectile {
+            position: absolute; font-size: 3rem; top: 45%; left: 25%;
+            pointer-events: none; z-index: 10; opacity: 0;
+        }
+        .anim-shoot { animation: shootObj 0.6s forwards; }
+        @keyframes shootObj {
+            0% { left: 25%; opacity: 1; transform: scale(0.5); }
+            80% { left: 75%; opacity: 1; transform: scale(1.2) rotate(360deg); }
+            100% { left: 85%; opacity: 0; transform: scale(1.5); }
+        }
+        .projectile-enemy {
+            position: absolute; font-size: 3rem; top: 45%; right: 25%;
+            pointer-events: none; z-index: 10; opacity: 0;
+        }
+        .anim-shoot-left { animation: shootObjLeft 0.6s forwards; }
+        @keyframes shootObjLeft {
+            0% { right: 25%; opacity: 1; transform: scale(0.5); }
+            80% { right: 75%; opacity: 1; transform: scale(1.2) rotate(-360deg); }
+            100% { right: 85%; opacity: 0; transform: scale(1.5); }
+        }
+        .damage-text {
+            position: absolute; color: #d32f2f; font-weight: 900; font-size: 2.5rem;
+            text-shadow: 2px 2px 0 #fff, 0 0 5px rgba(0,0,0,0.3);
+            pointer-events: none; animation: floatUp 1s forwards; z-index: 20;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
+        }
+
+        /* --- UI --- */
+        canvas {
+            background: #fff; border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 10px auto; display: block;
+            width: 260px; height: 260px;
+        }
+        .input-area {
+            background: rgba(255,255,255,0.85); border: 2px solid #ddd;
+            padding: 15px; border-radius: 15px;
+        }
+        input[type="number"] {
+            width: 65px; height: 55px; font-size: 2rem; text-align: center;
+            border: 3px solid #555; border-radius: 10px; margin: 0 5px;
+            background: #fff; color: #333; font-weight: bold;
+        }
+        .attack-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            margin-top: 10px; display: none;
+        }
+        .skill-btn {
+            background: #ff5722; color: white; border: 2px solid #bf360c;
+            padding: 15px 5px; border-radius: 12px; font-size: 1.1rem; 
+            font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #bf360c;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: transform 0.1s;
+            line-height: 1.3; white-space: normal;
+        }
+        .skill-btn:active { transform: translateY(4px); box-shadow: none; }
+        .skill-btn:nth-child(odd) { background: #009688; border-color: #004d40; box-shadow: 0 4px 0 #004d40; }
+        .skill-btn:nth-child(even) { background: #673ab7; border-color: #311b92; box-shadow: 0 4px 0 #311b92; }
+
+        #tutorial-overlay, #end-screen {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.98); z-index: 50; border-radius: 20px;
+            padding: 20px; box-sizing: border-box;
+        }
+        .tutorial-content { text-align: left; font-size: 1.1rem; line-height: 1.6; color: #333; }
+        .highlight-red { color: #d32f2f; font-weight: bold; }
+        .highlight-blue { color: #1976d2; font-weight: bold; }
+
+        .btn-main {
+            background: #2196f3; color: white; border: none; padding: 15px 30px;
+            border-radius: 50px; font-size: 1.3rem; font-weight: bold;
+            cursor: pointer; margin-top: 20px; box-shadow: 0 4px 0 #1565c0; width: 100%;
+        }
+        .btn-main:active { transform: translateY(4px); box-shadow: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <div id="scene-select">
+        <h1>🔥 寶可夢時鐘大亂鬥 🔥</h1>
+        <p>選擇你的戰士：</p>
+        <div class="char-select-grid">
+            <button class="char-btn theme-snorlax" onclick="initGame('snorlax')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/143.gif" alt="卡比獸">
+                <b>卡比獸</b>
+            </button>
+            <button class="char-btn theme-mew" onclick="initGame('mew')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/151.gif" alt="夢幻">
+                <b>夢幻</b>
+            </button>
+            <button class="char-btn theme-pikachu" onclick="initGame('pikachu')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif" alt="皮卡丘">
+                <b>皮卡丘</b>
+            </button>
+            <button class="char-btn theme-eevee" onclick="initGame('eevee')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/133.gif" alt="伊布">
+                <b>伊布</b>
+            </button>
+        </div>
+    </div>
+
+    <div id="scene-game" class="hidden">
+        
+        <div class="battle-scene">
+            <div class="character-wrapper">
+                <div class="hp-text">你</div>
+                <div class="hp-bar-frame"><div id="hp-player" class="hp-fill"></div></div>
+                <img id="char-player-img" class="poke-img player-flip" src="" alt="Player">
+                <div id="player-projectile" class="projectile">💨</div>
+            </div>
+
+            <div style="font-weight:900; font-size:2rem; color:#ddd; padding-bottom:40px;">VS</div>
+
+            <div class="character-wrapper">
+                <div class="hp-text">可達鴨</div>
+                <div class="hp-bar-frame"><div id="hp-enemy" class="hp-fill" style="background: linear-gradient(90deg, #ff5252, #d32f2f);"></div></div>
+                <img id="char-enemy-img" class="poke-img aura-psyduck" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/54.gif" alt="Psyduck">
+                <div id="enemy-projectile" class="projectile-enemy">💧</div>
+                <div id="damage-popup" class="damage-text" style="display:none; top: 20%; right: 10%;">-25</div>
+            </div>
+        </div>
+
+        <div id="battle-log" style="min-height:40px; color:#333; font-weight:bold; margin-bottom:5px; background:#fff; padding:5px; border-radius:10px; border:1px solid #ddd;">
+            戰鬥開始！選擇你的寶可夢！
+        </div>
+
+        <div id="quiz-section">
+            <canvas id="clockCanvas" width="300" height="300"></canvas>
+            
+            <div class="input-area">
+                <div id="input-controls">
+                    <input type="number" id="in-hour" placeholder="時" min="1" max="12"> :
+                    <input type="number" id="in-min" placeholder="分" min="0" max="59">
+                    <br><br>
+                    <button onclick="checkAnswer()" class="btn-main" style="margin-top:0;">攻擊！</button>
+                </div>
+
+                <div id="attack-grid" class="attack-grid"></div>
+                
+                <button id="next-btn" class="btn-main" style="display:none;" onclick="nextRound()">下一題</button>
+            </div>
+        </div>
+
+        <div id="tutorial-overlay">
+            <h2 style="color:#d32f2f;">🤕 哎呀！看錯了！</h2>
+            <div id="tutorial-text" class="tutorial-content"></div>
+            <button class="btn-main" style="background:#4caf50;" onclick="closeTutorial()">我知道了，再試一次！</button>
+        </div>
+    </div>
+
+    <div id="end-screen">
+        <h1 id="end-title"></h1>
+        <img id="end-img" style="width:150px; height:150px;" src="" alt="Win/Lose">
+        <p id="end-desc" style="font-size:1.2rem; font-weight:bold;"></p>
+        <button class="btn-main" onclick="location.reload()">再來一場</button>
+    </div>
+
+</div>
+
+<script>
+    // --- 圖片資源 (新增皮卡丘與伊布) ---
+    const IMGS = {
+        snorlax: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/143.gif",
+        mew: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/151.gif",
+        pikachu: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif",
+        eevee: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/133.gif",
+        psyduck: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/54.gif",
+        win: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png",
+        lose: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+    };
+
+    // --- 擴充到 28 個搞笑攻擊招式庫 ---
+    const ATTACK_POOL = [
+        // 原有 20 個
+        { id: 1, name: '💨 連環臭屁', icon: '💨', msg: '你放了一個超級響屁！可達鴨被臭暈了！' },
+        { id: 2, name: '🤣 搔癢攻擊', icon: '👐', msg: '你偷襲可達鴨的胳肢窩！他笑到在地上打滾！' },
+        { id: 3, name: '🤪 扮鬼臉', icon: '🤡', msg: '你做了一個超醜的鬼臉！可達鴨嚇呆了！' },
+        { id: 4, name: '🦵 摳腳皮彈射', icon: '🥐', msg: '你把陳年腳皮彈出去！精準命中可達鴨的鼻孔！' }, 
+        { id: 5, name: '💤 震天打呼', icon: '🔊', msg: '你的打呼聲像打雷一樣！震破了可達鴨的耳膜！' },
+        { id: 6, name: '🦶 無敵臭腳丫', icon: '🤢', msg: '你伸出沒洗的臭腳！這味道比垃圾車還可怕！' },
+        { id: 7, name: '🦠 巨大鼻屎', icon: '☝️', msg: '你挖出一顆特大號鼻屎，黏在可達鴨頭上！' },
+        { id: 8, name: '🍑 屁股撞擊', icon: '💥', msg: '你用屁股用力撞飛可達鴨！好有彈性啊！' },
+        { id: 9, name: '😭 耍賴打滾', icon: '🛌', msg: '你躺在地上大哭打滾！可達鴨覺得很尷尬...' },
+        { id: 10, name: '🎤 胖虎歌聲', icon: '🎤', msg: '你開始唱超難聽的歌！可達鴨痛苦地摀住耳朵！' },
+        { id: 11, name: '🍌 香蕉皮陷阱', icon: '🍌', msg: '你丟出香蕉皮！可達鴨踩到滑了一大跤！' },
+        { id: 12, name: '❄️ 急凍冷笑話', icon: '⛄', msg: '你說了一個超冷的笑話！空氣瞬間結冰了！' },
+        { id: 13, name: '👙 偷穿內褲', icon: '🩲', msg: '你把內褲套在頭上衝過去！可達鴨被你的造型嚇傻了！' },
+        { id: 14, name: '💋 噁心飛吻', icon: '💋', msg: '你送出充滿口水的飛吻！可達鴨覺得超噁心！' },
+        { id: 15, name: '🤏 捏臉頰', icon: '🤏', msg: '你用力捏可達鴨的臉頰！臉都被拉長了！' },
+        { id: 16, name: '📖 無聊故事', icon: '🥱', msg: '你開始講數學課的故事... 可達鴨睡著了！' },
+        { id: 17, name: '💦 吐口水', icon: '💦', msg: '呸！你吐了一口口水！很不衛生但很有效！' },
+        { id: 18, name: '🖍️ 亂畫臉', icon: '🖍️', msg: '你拿出彩色筆在可達鴨臉上畫了一隻烏龜！' },
+        { id: 19, name: '🍩 偷吃零食', icon: '🍩', msg: '你搶走可達鴨的餅乾吃掉！他的心碎了！' },
+        { id: 20, name: '👃 鼻毛攻擊', icon: '〰️', msg: '你拔下一根鼻毛甩過去！這是什麼奇怪的招式？！' },
+        // 新增 8 個
+        { id: 21, name: '🏀 皮球攻擊', icon: '🏀', msg: '你丟出一顆超有彈性的皮球！在可達鴨臉上彈了十下！' },
+        { id: 22, name: '😭 大哭攻擊', icon: '🌊', msg: '你張大嘴巴哇哇大哭！眼淚像噴泉一樣噴向可達鴨！' },
+        { id: 23, name: '🍍 鳳梨酥攻擊', icon: '🍍', msg: '你塞了一塊超甜的鳳梨酥到可達鴨嘴裡！甜到他牙齒痛！' },
+        { id: 24, name: '🦷 蛀牙攻擊', icon: '😷', msg: '你對著可達鴨哈氣，傳染了蛀牙菌！他的牙齒開始痛了！' },
+        { id: 25, name: '💯 100張數學考卷', icon: '📜', msg: '你丟出100張數學考卷！可達鴨看到密密麻麻的數字直接暈倒！' },
+        { id: 26, name: '🔧 拔牙攻擊', icon: '🔧', msg: '你拿出一把大板手要幫可達鴨拔牙！他嚇得臉色發白！' },
+        { id: 27, name: '🏹 香港腳弓箭', icon: '🦶', msg: '你把臭襪子綁在箭上射出去！精準命中紅心！臭氣沖天！' },
+        { id: 28, name: '🥔 愛情洋芋片', icon: '🧡', msg: '你丟出一片愛心形狀的洋芋片！可達鴨吃了覺得心裡暖暖的...然後就肚子痛了！' }
+    ];
+
+    // --- 可達鴨的反擊 ---
+    const ENEMY_ATTACKS = [
+        { name: '頭痛光波', icon: '⚡', msg: '可達鴨頭痛了！發射出奇怪的光波！' },
+        { name: '發呆凝視', icon: '👀', msg: '可達鴨一直盯著你看... 你覺得心裡發毛！' },
+        { name: '滑倒撞擊', icon: '💫', msg: '可達鴨不小心滑倒，整個人撞在你身上！' },
+        { name: '噴水攻擊', icon: '💧', msg: '可達鴨噴了一口水在你臉上！好濕啊！' },
+        { name: '呱呱噪音', icon: '🦆', msg: '可達鴨大叫「呱呱呱」！吵死人了！' },
+        { name: '搔頭困惑', icon: '❓', msg: '可達鴨歪著頭... 他自己也搞不清楚狀況，但你受傷了！' }
+    ];
+
+    let myChar = '';
+    let myHp = 100;
+    let enemyHp = 100;
+    let curHour = 0;
+    let curMin = 0;
+    let forcedMistakeType = null;
+
+    const canvas = document.getElementById('clockCanvas');
+    const ctx = canvas.getContext('2d');
+    const radius = canvas.height / 2;
+
+    // --- 初始化 (新增角色判斷) ---
+    function initGame(char) {
+        myChar = char;
+        const pImg = document.getElementById('char-player-img');
+        const bgEl = document.getElementById('game-container');
+        
+        pImg.src = IMGS[char];
+        // 設定不同角色的背景和光環
+        if(char === 'snorlax') {
+            pImg.classList.add('aura-snorlax'); bgEl.style.background = '#E3F2FD'; 
+        } else if(char === 'mew') {
+            pImg.classList.add('aura-mew'); bgEl.style.background = '#FCE4EC';
+        } else if(char === 'pikachu') {
+            pImg.classList.add('aura-pikachu'); bgEl.style.background = '#FFFACD'; // 淡黃色
+        } else if(char === 'eevee') {
+            pImg.classList.add('aura-eevee'); bgEl.style.background = '#FAF0E6'; // 淡褐色
+        }
+
+        document.getElementById('scene-select').classList.add('hidden');
+        document.getElementById('scene-game').classList.remove('hidden');
+        generateQuestion();
+    }
+
+    // --- 攻擊與動畫系統 ---
+    function generateAttacks() {
+        let shuffled = [...ATTACK_POOL].sort(() => 0.5 - Math.random());
+        let selected = shuffled.slice(0, 4);
+        
+        const grid = document.getElementById('attack-grid');
+        grid.innerHTML = ''; 
+        selected.forEach(atk => {
+            let btn = document.createElement('button');
+            btn.className = 'skill-btn';
+            btn.innerHTML = `${atk.icon} ${atk.name}`;
+            btn.onclick = () => performAttack(atk);
+            grid.appendChild(btn);
+        });
+        document.getElementById('input-controls').style.display = 'none';
+        grid.style.display = 'grid';
+        document.getElementById('battle-log').innerHTML = "<span style='color:green'>✅ 答對了！快選一個超好笑的招式！</span>";
+    }
+
+    function performAttack(atk) {
+        const grid = document.getElementById('attack-grid');
+        grid.style.display = 'none';
+        document.getElementById('battle-log').innerText = atk.msg;
+        const player = document.getElementById('char-player-img');
+        const enemy = document.getElementById('char-enemy-img');
+        const projectile = document.getElementById('player-projectile');
+        const dmgPopup = document.getElementById('damage-popup');
+
+        player.classList.add('anim-lunge-right');
+        projectile.innerText = atk.icon;
+        setTimeout(() => projectile.classList.add('anim-shoot'), 100);
+
+        setTimeout(() => {
+            enemy.classList.add('anim-hit'); enemy.classList.add('filter-hurt');
+            let dmg = 20 + Math.floor(Math.random()*10);
+            dmgPopup.innerText = "-" + dmg; dmgPopup.style.display = 'block';
+            enemyHp -= 20; 
+            updateHp();
+            setTimeout(() => {
+                player.classList.remove('anim-lunge-right'); projectile.classList.remove('anim-shoot');
+                enemy.classList.remove('anim-hit'); enemy.classList.remove('filter-hurt');
+                dmgPopup.style.display = 'none';
+                if(enemyHp <= 0) {
+                    setTimeout(() => endGame(true), 800);
+                } else {
+                    document.getElementById('next-btn').style.display = 'block';
+                    document.getElementById('battle-log').innerText = "可達鴨被打暈了！趁勝追擊！";
+                }
+            }, 1000);
+        }, 600);
+    }
+
+    function enemyAttack() {
+        const atk = ENEMY_ATTACKS[Math.floor(Math.random() * ENEMY_ATTACKS.length)];
+        document.getElementById('battle-log').innerHTML = `<span style='color:#d32f2f'>${atk.msg}</span>`;
+        const enemy = document.getElementById('char-enemy-img');
+        const player = document.getElementById('char-player-img');
+        const proj = document.getElementById('enemy-projectile');
+
+        enemy.classList.add('anim-lunge-left');
+        proj.innerText = atk.icon;
+        setTimeout(() => proj.classList.add('anim-shoot-left'), 100);
+
+        setTimeout(() => {
+            player.classList.add('anim-hit'); player.classList.add('filter-hurt');
+            myHp -= 20; updateHp();
+            setTimeout(() => {
+                enemy.classList.remove('anim-lunge-left'); proj.classList.remove('anim-shoot-left');
+                player.classList.remove('anim-hit'); player.classList.remove('filter-hurt');
+                if(myHp <= 0) setTimeout(() => endGame(false), 1000);
+            }, 500);
+        }, 300);
+    }
+
+    // --- 時鐘邏輯 ---
+    function generateQuestion() {
+        if (forcedMistakeType === 'tricky_hour') {
+            curHour = Math.floor(Math.random() * 12) + 1;
+            curMin = 40 + Math.floor(Math.random() * 20); 
+            document.getElementById('battle-log').innerHTML = "<span style='color:red'>🔥 特訓：短針快碰到下個數字了，要小心！</span>";
+        } else if (forcedMistakeType === 'minutes') {
+            curHour = Math.floor(Math.random() * 12) + 1;
+            curMin = Math.floor(Math.random() * 60);
+            document.getElementById('battle-log').innerHTML = "<span style='color:red'>🔥 特訓：仔細數一數小格子！</span>";
+        } else {
+            curHour = Math.floor(Math.random() * 12) + 1;
+            if(Math.random() > 0.3) curMin = Math.floor(Math.random() * 12) * 5;
+            else curMin = Math.floor(Math.random() * 60);
+            document.getElementById('battle-log').innerText = "請輸入：現在是幾點幾分？";
+            document.getElementById('battle-log').style.color = "#333";
+        }
+        drawClock(curHour, curMin);
+    }
+
+    function drawClock(h, m) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.save(); ctx.translate(radius, radius);
+        // 錶盤
+        ctx.beginPath(); ctx.arc(0, 0, radius * 0.95, 0, 2*Math.PI); ctx.fillStyle = 'white'; ctx.fill();
+        ctx.lineWidth = 8;
+        // 根據角色改變錶盤顏色
+        let strokeColor = '#4682B4'; // 預設卡比獸藍
+        if(myChar === 'mew') strokeColor = '#FF69B4';
+        else if(myChar === 'pikachu') strokeColor = '#FFD700';
+        else if(myChar === 'eevee') strokeColor = '#A0522D';
+        ctx.strokeStyle = strokeColor; ctx.stroke();
+
+        // 刻度
+        for(let i=0; i<60; i++) {
+            let ang = i * Math.PI / 30; let isMajor = (i % 5 === 0);
+            ctx.beginPath();
+            if (isMajor) {
+                ctx.lineWidth = 4; ctx.strokeStyle = "#333";
+                ctx.moveTo(radius*0.80 * Math.sin(ang), -radius*0.80 * Math.cos(ang));
+                ctx.lineTo(radius*0.92 * Math.sin(ang), -radius*0.92 * Math.cos(ang));
+            } else {
+                ctx.lineWidth = 1.5; ctx.strokeStyle = "#999";
+                ctx.moveTo(radius*0.85 * Math.sin(ang), -radius*0.85 * Math.cos(ang));
+                ctx.lineTo(radius*0.92 * Math.sin(ang), -radius*0.92 * Math.cos(ang));
+            }
+            ctx.stroke();
+        }
+        // 數字
+        ctx.font = "bold " + (radius*0.15) + "px Arial"; ctx.textBaseline="middle"; ctx.textAlign="center"; ctx.fillStyle = '#333';
+        for(let num = 1; num <= 12; num++){
+            let ang = num * Math.PI / 6;
+            ctx.fillText(num.toString(), radius*0.68 * Math.sin(ang), -radius*0.68 * Math.cos(ang));
+        }
+        // 指針
+        let mAng = (m * Math.PI / 30); let hAng = (h % 12 * Math.PI / 6) + (mAng / 12);
+        ctx.beginPath(); ctx.lineWidth = 9; ctx.lineCap = "round"; ctx.strokeStyle = '#333'; // 時針
+        ctx.moveTo(0,0); ctx.rotate(hAng); ctx.lineTo(0, -radius*0.45); ctx.stroke(); ctx.rotate(-hAng);
+        ctx.beginPath(); ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.strokeStyle = '#d32f2f'; // 分針
+        ctx.moveTo(0,0); ctx.rotate(mAng); ctx.lineTo(0, -radius*0.70); ctx.stroke(); ctx.rotate(-mAng);
+        ctx.beginPath(); ctx.arc(0, 0, 8, 0, 2*Math.PI); ctx.fillStyle = '#333'; ctx.fill(); // 中心
+        ctx.beginPath(); ctx.arc(0, 0, 4, 0, 2*Math.PI); ctx.fillStyle = '#d32f2f'; ctx.fill();
+        ctx.restore();
+    }
+
+    function checkAnswer() {
+        const inH = parseInt(document.getElementById('in-hour').value);
+        const inM = parseInt(document.getElementById('in-min').value);
+        if(isNaN(inH) || isNaN(inM)) return;
+        if(inH === curHour && inM === curMin) {
+            generateAttacks(); forcedMistakeType = null;
+        } else {
+            analyzeError(inH, inM);
+        }
+    }
+
+    function analyzeError(userH, userM) {
+        let html = "";
+        let isTrickyHour = (curMin >= 40); 
+        if (isTrickyHour && userH === (curHour % 12) + 1) {
+            html += `<p>你把時針看成 <span class="highlight-red">${userH}</span> 了嗎？</p>`;
+            html += `<p>⚠️ 雖然很像，但長針還沒走到12，所以現在還是 <span class="highlight-blue">${curHour} 點多</span>喔！</p>`;
+            forcedMistakeType = 'tricky_hour';
+        } else if (userM !== curMin) {
+            let nearestBig = Math.floor(curMin / 5);
+            html += `<p>分針數錯囉。先看經過的大數字 <b>${nearestBig}</b>。</p>`;
+            html += `<p>${nearestBig} x 5 = ${nearestBig*5}，然後再數小格子：${nearestBig*5+1}... 到 <span class="highlight-blue">${curMin}</span>！</p>`;
+            forcedMistakeType = 'minutes';
+        } else {
+            html += `<p>正確答案是 <span class="highlight-blue">${curHour} 點 ${curMin} 分</span>。</p>`;
+            html += `<p>再仔細看一下喔！</p>`;
+            forcedMistakeType = null;
+        }
+        document.getElementById('tutorial-text').innerHTML = html;
+        document.getElementById('tutorial-overlay').style.display = 'block';
+        enemyAttack();
+    }
+
+    function closeTutorial() {
+        document.getElementById('tutorial-overlay').style.display = 'none';
+        document.getElementById('in-hour').value = ''; document.getElementById('in-min').value = '';
+        document.getElementById('in-hour').focus(); document.getElementById('battle-log').innerText = "再試一次！";
+    }
+
+    function nextRound() {
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('input-controls').style.display = 'block';
+        document.getElementById('in-hour').value = ''; document.getElementById('in-min').value = '';
+        generateQuestion();
+    }
+
+    function updateHp() {
+        document.getElementById('hp-player').style.width = Math.max(0, myHp) + '%';
+        document.getElementById('hp-enemy').style.width = Math.max(0, enemyHp) + '%';
+    }
+
+    function endGame(win) {
+        document.getElementById('scene-game').classList.add('hidden');
+        document.getElementById('end-screen').style.display = 'block';
+        const img = document.getElementById('end-img');
+        if(win) {
+            document.getElementById('end-title').innerText = "🎉 挑戰成功！";
+            img.src = IMGS.win; 
+            document.getElementById('end-desc').innerText = "你太厲害了！可達鴨完全被打敗了！";
+        } else {
+            document.getElementById('end-title').innerText = "😢 挑戰失敗...";
+            img.src = IMGS.lose;
+            document.getElementById('end-desc').innerText = "沒關係，多練習幾次，下次一定會贏！";
+        }
+    }
+</script>
+</body>
+</html>
