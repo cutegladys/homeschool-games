@@ -31,10 +31,10 @@
             transition: background 0.5s;
         }
 
-        /* --- 選角畫面調整 (改為 2x2 網格) --- */
+        /* --- 選角畫面調整 (改為 3x3 網格) --- */
         .char-select-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 15px;
             margin-top: 20px;
         }
@@ -53,6 +53,11 @@
         .theme-mew { border-color: #FF69B4; background: #FCE4EC; color: #C2185B; }
         .theme-pikachu { border-color: #FFD700; background: #FFFACD; color: #9A8C00; }
         .theme-eevee { border-color: #A0522D; background: #FAF0E6; color: #8B4513; }
+        .theme-alcremie { border-color: #FFB6C1; background: #FFF0F5; color: #C2185B; }
+        .theme-terapagos { border-color: #87CEEB; background: #E0F7FA; color: #0277BD; }
+        .theme-charizard { border-color: #FF6B35; background: #FFF3E0; color: #E65100; }
+        .theme-jirachi { border-color: #FFD700; background: #FFF9C4; color: #F57F17; }
+        .theme-riolu { border-color: #4A90E2; background: #E3F2FD; color: #1565C0; }
 
 
         /* --- 戰鬥場景 --- */
@@ -100,30 +105,61 @@
         .aura-mew { filter: drop-shadow(0 0 8px #E91E63); }
         .aura-pikachu { filter: drop-shadow(0 0 8px #FFD700); }
         .aura-eevee { filter: drop-shadow(0 0 8px #A0522D); }
+        .aura-alcremie { filter: drop-shadow(0 0 10px #FFB6C1); }
+        .aura-terapagos { filter: drop-shadow(0 0 10px #87CEEB); }
+        .aura-charizard { filter: drop-shadow(0 0 12px #FF6B35); }
+        .aura-jirachi { filter: drop-shadow(0 0 12px #FFD700); }
+        .aura-riolu { filter: drop-shadow(0 0 10px #4A90E2); }
         .aura-psyduck { filter: drop-shadow(0 0 8px #FFC107); }
         .filter-hurt { filter: sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.8); }
 
         /* --- 動畫 Class --- */
-        .anim-lunge-right { animation: lungeRight 0.3s ease-in-out; }
+        .anim-lunge-right { animation: lungeRight 0.5s ease-in-out; }
         @keyframes lungeRight {
-            0% { transform: scaleX(-1) translateX(0); }
-            50% { transform: scaleX(-1) translateX(-40px); }
-            100% { transform: scaleX(-1) translateX(0); }
+            0% { transform: scaleX(-1) translateX(0) translateY(0) scale(1); }
+            30% { transform: scaleX(-1) translateX(-20px) translateY(-10px) scale(1.1); }
+            50% { transform: scaleX(-1) translateX(-50px) translateY(0) scale(1.15); }
+            70% { transform: scaleX(-1) translateX(-30px) translateY(5px) scale(1.05); }
+            100% { transform: scaleX(-1) translateX(0) translateY(0) scale(1); }
         }
-        .anim-lunge-left { animation: lungeLeft 0.3s ease-in-out; }
+        .anim-lunge-left { animation: lungeLeft 0.5s ease-in-out; }
         @keyframes lungeLeft {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-40px); }
-            100% { transform: translateX(0); }
+            0% { transform: translateX(0) translateY(0) scale(1); }
+            30% { transform: translateX(-20px) translateY(-10px) scale(1.1); }
+            50% { transform: translateX(-50px) translateY(0) scale(1.15); }
+            70% { transform: translateX(-30px) translateY(5px) scale(1.05); }
+            100% { transform: translateX(0) translateY(0) scale(1); }
         }
-        .anim-hit { animation: hitShake 0.4s ease-in-out; }
+        .anim-hit { animation: hitShake 0.6s ease-in-out; }
         @keyframes hitShake {
-            0% { transform: translate(0, 0) rotate(0); }
-            20% { transform: translate(-5px, 5px) rotate(-5deg); }
-            40% { transform: translate(5px, -5px) rotate(5deg); }
-            60% { transform: translate(-5px, 0px) rotate(-5deg); }
-            80% { transform: translate(5px, 0px) rotate(5deg); }
-            100% { transform: translate(0, 0) rotate(0); }
+            0% { transform: translate(0, 0) rotate(0) scale(1); }
+            10% { transform: translate(15px, -10px) rotate(15deg) scale(1.1); }
+            20% { transform: translate(-10px, 5px) rotate(-10deg) scale(0.95); }
+            30% { transform: translate(8px, -5px) rotate(8deg) scale(1.05); }
+            40% { transform: translate(-8px, 3px) rotate(-8deg) scale(0.98); }
+            50% { transform: translate(5px, -3px) rotate(5deg) scale(1.02); }
+            60% { transform: translate(-5px, 2px) rotate(-5deg) scale(0.99); }
+            70% { transform: translate(3px, -1px) rotate(3deg) scale(1.01); }
+            80% { transform: translate(-2px, 1px) rotate(-2deg) scale(1); }
+            100% { transform: translate(0, 0) rotate(0) scale(1); }
+        }
+        .anim-knockback { animation: knockback 0.4s ease-out; }
+        @keyframes knockback {
+            0% { transform: translateX(0) rotate(0); }
+            50% { transform: translateX(20px) rotate(10deg); }
+            100% { transform: translateX(0) rotate(0); }
+        }
+        .anim-jump { animation: jump 0.4s ease-out; }
+        @keyframes jump {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-25px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .anim-power-up { animation: powerUp 0.3s ease-out; }
+        @keyframes powerUp {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.2); filter: brightness(1.5); }
+            100% { transform: scale(1); filter: brightness(1); }
         }
         .projectile {
             position: absolute; font-size: 3rem; top: 45%; left: 25%;
@@ -202,6 +238,173 @@
         }
         .btn-main:active { transform: translateY(4px); box-shadow: none; }
         .hidden { display: none !important; }
+        
+        /* 倒數計時器 */
+        #countdown-timer {
+            position: relative;
+            margin: 10px auto;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 900;
+            padding: 15px 25px;
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.5);
+            border: 4px solid white;
+            z-index: 30;
+            min-width: 80px;
+            min-height: 80px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .countdown-warning { animation: shake 0.3s infinite !important; background: linear-gradient(135deg, #ff0000, #cc0000) !important; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) scale(1.1); }
+            25% { transform: translateX(-5px) scale(1.1); }
+            75% { transform: translateX(5px) scale(1.1); }
+        }
+        
+        /* 連擊系統 */
+        #combo-counter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 30;
+            display: none;
+        }
+        .combo-active { display: block !important; animation: comboPop 0.5s ease-out; }
+        @keyframes comboPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* 特殊效果 */
+        .explosion {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            pointer-events: none;
+            z-index: 25;
+            animation: explode 0.8s forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+            30% { transform: translate(-50%, -50%) scale(1.2) rotate(180deg); opacity: 1; }
+            60% { transform: translate(-50%, -50%) scale(1.8) rotate(360deg); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2.5) rotate(540deg); opacity: 0; }
+        }
+        
+        /* 背景震動效果 */
+        .battle-scene.shake {
+            animation: screenShake 0.5s ease-in-out;
+        }
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5px, -3px) rotate(-1deg); }
+            20% { transform: translate(5px, 3px) rotate(1deg); }
+            30% { transform: translate(-4px, -2px) rotate(-0.5deg); }
+            40% { transform: translate(4px, 2px) rotate(0.5deg); }
+            50% { transform: translate(-3px, -1px) rotate(-0.3deg); }
+            60% { transform: translate(3px, 1px) rotate(0.3deg); }
+            70% { transform: translate(-2px, 0) rotate(-0.1deg); }
+            80% { transform: translate(2px, 0) rotate(0.1deg); }
+            90% { transform: translate(-1px, 0); }
+        }
+        
+        /* 閃光特效 */
+        .flash-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            z-index: 15;
+            animation: flash 0.3s ease-out;
+            border-radius: 20px;
+        }
+        @keyframes flash {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        /* 衝擊波效果 */
+        .shockwave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 12;
+            animation: shockwaveExpand 0.6s ease-out;
+        }
+        @keyframes shockwaveExpand {
+            0% { width: 20px; height: 20px; opacity: 1; }
+            100% { width: 200px; height: 200px; opacity: 0; }
+        }
+        
+        /* 粒子效果 */
+        .particle {
+            position: absolute;
+            font-size: 1.5rem;
+            pointer-events: none;
+            z-index: 14;
+            animation: particleFloat 1s ease-out forwards;
+        }
+        @keyframes particleFloat {
+            0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translate(var(--tx, 0), var(--ty, -50px)) scale(0.5) rotate(360deg); }
+        }
+        
+        /* 攻擊預備動作 */
+        .anim-ready { animation: readyStance 0.3s ease-out; }
+        @keyframes readyStance {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 答題區域增強 */
+        .input-area {
+            position: relative;
+        }
+        .time-bonus {
+            position: absolute;
+            top: -30px;
+            right: 0;
+            color: #4caf50;
+            font-weight: 900;
+            font-size: 1.5rem;
+            animation: bonusFloat 1s forwards;
+            display: none;
+        }
+        @keyframes bonusFloat {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-30px); }
+        }
     </style>
 </head>
 <body>
@@ -228,10 +431,31 @@
                 <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/133.gif" alt="伊布">
                 <b>伊布</b>
             </button>
+            <button class="char-btn theme-alcremie" onclick="initGame('alcremie')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/869.gif" alt="霜奶仙">
+                <b>霜奶仙</b>
+            </button>
+            <button class="char-btn theme-terapagos" onclick="initGame('terapagos')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1024.png" alt="太樂巴戈斯" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1024.png'">
+                <b>太樂巴戈斯</b>
+            </button>
+            <button class="char-btn theme-charizard" onclick="initGame('charizard')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/6.gif" alt="噴火龍">
+                <b>噴火龍</b>
+            </button>
+            <button class="char-btn theme-jirachi" onclick="initGame('jirachi')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/385.gif" alt="基拉祈">
+                <b>基拉祈</b>
+            </button>
+            <button class="char-btn theme-riolu" onclick="initGame('riolu')">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/447.gif" alt="利歐路">
+                <b>利歐路</b>
+            </button>
         </div>
     </div>
 
     <div id="scene-game" class="hidden">
+        <div id="combo-counter">連擊 x<span id="combo-count">0</span></div>
         
         <div class="battle-scene">
             <div class="character-wrapper">
@@ -257,9 +481,11 @@
         </div>
 
         <div id="quiz-section">
+            <div id="countdown-timer">30</div>
             <canvas id="clockCanvas" width="300" height="300"></canvas>
             
             <div class="input-area">
+                <div id="time-bonus" class="time-bonus">+時間獎勵！</div>
                 <div id="input-controls">
                     <input type="number" id="in-hour" placeholder="時" min="1" max="12"> :
                     <input type="number" id="in-min" placeholder="分" min="0" max="59">
@@ -290,12 +516,17 @@
 </div>
 
 <script>
-    // --- 圖片資源 (新增皮卡丘與伊布) ---
+    // --- 圖片資源 (新增基拉祈和利歐路) ---
     const IMGS = {
         snorlax: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/143.gif",
         mew: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/151.gif",
         pikachu: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif",
         eevee: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/133.gif",
+        alcremie: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/869.gif",
+        terapagos: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1024.png",
+        charizard: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/6.gif",
+        jirachi: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/385.gif",
+        riolu: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/447.gif",
         psyduck: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/54.gif",
         win: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png",
         lose: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
@@ -335,14 +566,28 @@
         { id: 28, name: '🥔 愛情洋芋片', icon: '🧡', msg: '你丟出一片愛心形狀的洋芋片！可達鴨吃了覺得心裡暖暖的...然後就肚子痛了！' }
     ];
 
-    // --- 可達鴨的反擊 ---
+    // --- 可達鴨的反擊 (擴充到20個搞笑招式) ---
     const ENEMY_ATTACKS = [
         { name: '頭痛光波', icon: '⚡', msg: '可達鴨頭痛了！發射出奇怪的光波！' },
         { name: '發呆凝視', icon: '👀', msg: '可達鴨一直盯著你看... 你覺得心裡發毛！' },
         { name: '滑倒撞擊', icon: '💫', msg: '可達鴨不小心滑倒，整個人撞在你身上！' },
         { name: '噴水攻擊', icon: '💧', msg: '可達鴨噴了一口水在你臉上！好濕啊！' },
         { name: '呱呱噪音', icon: '🦆', msg: '可達鴨大叫「呱呱呱」！吵死人了！' },
-        { name: '搔頭困惑', icon: '❓', msg: '可達鴨歪著頭... 他自己也搞不清楚狀況，但你受傷了！' }
+        { name: '搔頭困惑', icon: '❓', msg: '可達鴨歪著頭... 他自己也搞不清楚狀況，但你受傷了！' },
+        { name: '頭痛爆炸', icon: '💥', msg: '可達鴨頭痛到爆炸！碎片飛得到處都是！' },
+        { name: '迷糊亂舞', icon: '🌀', msg: '可達鴨開始轉圈圈！轉到頭暈撞到你！' },
+        { name: '打嗝攻擊', icon: '🤢', msg: '可達鴨打了一個超大的嗝！臭氣熏天！' },
+        { name: '裝死騙人', icon: '💀', msg: '可達鴨突然裝死！你嚇了一跳，結果他趁機偷襲！' },
+        { name: '頭撞地板', icon: '🔨', msg: '可達鴨用頭撞地板！地板裂開了，你掉進洞裡！' },
+        { name: '流口水攻擊', icon: '🤤', msg: '可達鴨流了一大堆口水！黏黏的，好噁心！' },
+        { name: '打瞌睡', icon: '😴', msg: '可達鴨開始打瞌睡... 突然夢遊攻擊你！' },
+        { name: '翻白眼', icon: '🙄', msg: '可達鴨翻了一個超大的白眼！你被白眼攻擊了！' },
+        { name: '頭痛跳躍', icon: '🦘', msg: '可達鴨頭痛到開始亂跳！不小心跳到你的頭上！' },
+        { name: '迷糊噴嚏', icon: '🤧', msg: '可達鴨打了一個超大的噴嚏！鼻涕飛到你臉上！' },
+        { name: '頭痛搖擺', icon: '🎪', msg: '可達鴨頭痛到開始搖擺！像個不倒翁一樣撞你！' },
+        { name: '裝可愛', icon: '🥺', msg: '可達鴨突然裝可愛！你被萌到忘記防禦！' },
+        { name: '頭痛旋風', icon: '🌪️', msg: '可達鴨頭痛到開始轉圈！形成一個小旋風把你捲進去！' },
+        { name: '迷糊衝撞', icon: '🐂', msg: '可達鴨搞不清楚方向，到處亂衝！最後撞到你！' }
     ];
 
     let myChar = '';
@@ -351,6 +596,10 @@
     let curHour = 0;
     let curMin = 0;
     let forcedMistakeType = null;
+    let countdownTimer = null;
+    let timeLeft = 30;
+    let comboCount = 0;
+    let startTime = null;
 
     const canvas = document.getElementById('clockCanvas');
     const ctx = canvas.getContext('2d');
@@ -369,13 +618,25 @@
         } else if(char === 'mew') {
             pImg.classList.add('aura-mew'); bgEl.style.background = '#FCE4EC';
         } else if(char === 'pikachu') {
-            pImg.classList.add('aura-pikachu'); bgEl.style.background = '#FFFACD'; // 淡黃色
+            pImg.classList.add('aura-pikachu'); bgEl.style.background = '#FFFACD';
         } else if(char === 'eevee') {
-            pImg.classList.add('aura-eevee'); bgEl.style.background = '#FAF0E6'; // 淡褐色
+            pImg.classList.add('aura-eevee'); bgEl.style.background = '#FAF0E6';
+        } else if(char === 'alcremie') {
+            pImg.classList.add('aura-alcremie'); bgEl.style.background = '#FFF0F5';
+        } else if(char === 'terapagos') {
+            pImg.classList.add('aura-terapagos'); bgEl.style.background = '#E0F7FA';
+        } else if(char === 'charizard') {
+            pImg.classList.add('aura-charizard'); bgEl.style.background = '#FFF3E0';
+        } else if(char === 'jirachi') {
+            pImg.classList.add('aura-jirachi'); bgEl.style.background = '#FFF9C4';
+        } else if(char === 'riolu') {
+            pImg.classList.add('aura-riolu'); bgEl.style.background = '#E3F2FD';
         }
 
         document.getElementById('scene-select').classList.add('hidden');
         document.getElementById('scene-game').classList.remove('hidden');
+        comboCount = 0;
+        updateComboDisplay();
         generateQuestion();
     }
 
@@ -406,26 +667,102 @@
         const enemy = document.getElementById('char-enemy-img');
         const projectile = document.getElementById('player-projectile');
         const dmgPopup = document.getElementById('damage-popup');
+        const battleScene = document.querySelector('.battle-scene');
+        const gameContainer = document.getElementById('game-container');
 
-        player.classList.add('anim-lunge-right');
-        projectile.innerText = atk.icon;
-        setTimeout(() => projectile.classList.add('anim-shoot'), 100);
-
+        // 第一階段：預備動作
+        player.classList.add('anim-ready');
         setTimeout(() => {
-            enemy.classList.add('anim-hit'); enemy.classList.add('filter-hurt');
-            let dmg = 20 + Math.floor(Math.random()*10);
-            dmgPopup.innerText = "-" + dmg; dmgPopup.style.display = 'block';
-            enemyHp -= 20; 
-            updateHp();
+            player.classList.remove('anim-ready');
+            player.classList.add('anim-jump');
+            
+            // 第二階段：衝刺攻擊
             setTimeout(() => {
-                player.classList.remove('anim-lunge-right'); projectile.classList.remove('anim-shoot');
-                enemy.classList.remove('anim-hit'); enemy.classList.remove('filter-hurt');
+                player.classList.remove('anim-jump');
+                player.classList.add('anim-lunge-right');
+                projectile.innerText = atk.icon;
+                setTimeout(() => projectile.classList.add('anim-shoot'), 100);
+            }, 200);
+        }, 300);
+
+        // 第三階段：擊中效果
+        setTimeout(() => {
+            // 背景震動
+            battleScene.classList.add('shake');
+            setTimeout(() => battleScene.classList.remove('shake'), 500);
+            
+            // 閃光效果
+            const flash = document.createElement('div');
+            flash.className = 'flash-effect';
+            gameContainer.appendChild(flash);
+            setTimeout(() => flash.remove(), 300);
+            
+            // 衝擊波
+            const shockwave = document.createElement('div');
+            shockwave.className = 'shockwave';
+            shockwave.style.left = '75%';
+            battleScene.appendChild(shockwave);
+            setTimeout(() => shockwave.remove(), 600);
+            
+            // 粒子效果
+            for(let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.textContent = ['✨', '⭐', '💫', '🌟', '⚡'][Math.floor(Math.random() * 5)];
+                    particle.style.left = '75%';
+                    particle.style.top = '45%';
+                    const angle = (Math.PI * 2 * i) / 5;
+                    const distance = 50 + Math.random() * 30;
+                    particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                    particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                    battleScene.appendChild(particle);
+                    setTimeout(() => particle.remove(), 1000);
+                }, i * 50);
+            }
+            
+            enemy.classList.add('anim-hit'); 
+            enemy.classList.add('anim-knockback');
+            enemy.classList.add('filter-hurt');
+            
+            // 計算傷害（連擊加成）
+            let baseDmg = 20 + Math.floor(Math.random()*10);
+            let comboBonus = Math.floor(comboCount / 2) * 5;
+            let totalDmg = baseDmg + comboBonus;
+            
+            dmgPopup.innerText = "-" + totalDmg; 
+            if (comboBonus > 0) {
+                dmgPopup.innerText += ` (連擊+${comboBonus})`;
+            }
+            dmgPopup.style.display = 'block';
+            
+            // 爆炸特效
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.textContent = '💥';
+            explosion.style.left = '75%';
+            battleScene.appendChild(explosion);
+            setTimeout(() => explosion.remove(), 800);
+            
+            enemyHp -= totalDmg; 
+            updateHp();
+            
+            setTimeout(() => {
+                player.classList.remove('anim-lunge-right'); 
+                projectile.classList.remove('anim-shoot');
+                enemy.classList.remove('anim-hit'); 
+                enemy.classList.remove('anim-knockback');
+                enemy.classList.remove('filter-hurt');
                 dmgPopup.style.display = 'none';
                 if(enemyHp <= 0) {
                     setTimeout(() => endGame(true), 800);
                 } else {
                     document.getElementById('next-btn').style.display = 'block';
-                    document.getElementById('battle-log').innerText = "可達鴨被打暈了！趁勝追擊！";
+                    let msg = "可達鴨被打暈了！趁勝追擊！";
+                    if (comboCount >= 3) {
+                        msg += ` 🔥 ${comboCount}連擊！太厲害了！`;
+                    }
+                    document.getElementById('battle-log').innerText = msg;
                 }
             }, 1000);
         }, 600);
@@ -437,24 +774,70 @@
         const enemy = document.getElementById('char-enemy-img');
         const player = document.getElementById('char-player-img');
         const proj = document.getElementById('enemy-projectile');
+        const battleScene = document.querySelector('.battle-scene');
+        const gameContainer = document.getElementById('game-container');
 
-        enemy.classList.add('anim-lunge-left');
-        proj.innerText = atk.icon;
-        setTimeout(() => proj.classList.add('anim-shoot-left'), 100);
+        // 預備動作
+        enemy.classList.add('anim-ready');
+        setTimeout(() => {
+            enemy.classList.remove('anim-ready');
+            enemy.classList.add('anim-jump');
+            
+            setTimeout(() => {
+                enemy.classList.remove('anim-jump');
+                enemy.classList.add('anim-lunge-left');
+                proj.innerText = atk.icon;
+                setTimeout(() => proj.classList.add('anim-shoot-left'), 100);
+            }, 200);
+        }, 300);
 
         setTimeout(() => {
-            player.classList.add('anim-hit'); player.classList.add('filter-hurt');
-            myHp -= 20; updateHp();
+            // 背景震動
+            battleScene.classList.add('shake');
+            setTimeout(() => battleScene.classList.remove('shake'), 500);
+            
+            // 閃光效果（較弱）
+            const flash = document.createElement('div');
+            flash.className = 'flash-effect';
+            flash.style.background = 'rgba(255, 0, 0, 0.3)';
+            gameContainer.appendChild(flash);
+            setTimeout(() => flash.remove(), 300);
+            
+            // 衝擊波
+            const shockwave = document.createElement('div');
+            shockwave.className = 'shockwave';
+            shockwave.style.left = '25%';
+            shockwave.style.borderColor = 'rgba(255, 0, 0, 0.6)';
+            battleScene.appendChild(shockwave);
+            setTimeout(() => shockwave.remove(), 600);
+            
+            player.classList.add('anim-hit'); 
+            player.classList.add('anim-knockback');
+            player.classList.add('filter-hurt');
+            
+            myHp -= 20; 
+            updateHp();
+            
             setTimeout(() => {
-                enemy.classList.remove('anim-lunge-left'); proj.classList.remove('anim-shoot-left');
-                player.classList.remove('anim-hit'); player.classList.remove('filter-hurt');
+                enemy.classList.remove('anim-lunge-left'); 
+                proj.classList.remove('anim-shoot-left');
+                player.classList.remove('anim-hit'); 
+                player.classList.remove('anim-knockback');
+                player.classList.remove('filter-hurt');
                 if(myHp <= 0) setTimeout(() => endGame(false), 1000);
             }, 500);
-        }, 300);
+        }, 600);
     }
 
     // --- 時鐘邏輯 ---
     function generateQuestion() {
+        // 重置倒數計時
+        if (countdownTimer) clearInterval(countdownTimer);
+        timeLeft = 30;
+        startTime = Date.now();
+        updateCountdown();
+        startCountdown();
+        
         if (forcedMistakeType === 'tricky_hour') {
             curHour = Math.floor(Math.random() * 12) + 1;
             curMin = 40 + Math.floor(Math.random() * 20); 
@@ -472,6 +855,67 @@
         }
         drawClock(curHour, curMin);
     }
+    
+    // 倒數計時功能
+    function startCountdown() {
+        countdownTimer = setInterval(() => {
+            timeLeft--;
+            updateCountdown();
+            if (timeLeft <= 0) {
+                clearInterval(countdownTimer);
+                timeUp();
+            }
+        }, 1000);
+    }
+    
+    function updateCountdown() {
+        const timerEl = document.getElementById('countdown-timer');
+        timerEl.textContent = timeLeft;
+        if (timeLeft <= 10) {
+            timerEl.classList.add('countdown-warning');
+        } else {
+            timerEl.classList.remove('countdown-warning');
+        }
+    }
+    
+    function timeUp() {
+        clearInterval(countdownTimer);
+        document.getElementById('battle-log').innerHTML = "<span style='color:red'>⏰ 時間到了！可達鴨趁機攻擊！</span>";
+        enemyAttack();
+        comboCount = 0;
+        updateComboDisplay();
+        setTimeout(() => {
+            document.getElementById('input-controls').style.display = 'block';
+            document.getElementById('in-hour').value = '';
+            document.getElementById('in-min').value = '';
+            generateQuestion();
+        }, 2000);
+    }
+    
+    // 連擊系統
+    function updateComboDisplay() {
+        const comboEl = document.getElementById('combo-counter');
+        const countEl = document.getElementById('combo-count');
+        countEl.textContent = comboCount;
+        if (comboCount >= 2) {
+            comboEl.classList.add('combo-active');
+        } else {
+            comboEl.classList.remove('combo-active');
+        }
+    }
+    
+    // 時間獎勵顯示
+    function showTimeBonus(secondsLeft) {
+        const bonusEl = document.getElementById('time-bonus');
+        const bonus = Math.floor(secondsLeft / 5);
+        if (bonus > 0) {
+            bonusEl.textContent = `⚡ 快速答對！+${bonus}分獎勵！`;
+            bonusEl.style.display = 'block';
+            setTimeout(() => {
+                bonusEl.style.display = 'none';
+            }, 1000);
+        }
+    }
 
     function drawClock(h, m) {
         ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.save(); ctx.translate(radius, radius);
@@ -483,6 +927,11 @@
         if(myChar === 'mew') strokeColor = '#FF69B4';
         else if(myChar === 'pikachu') strokeColor = '#FFD700';
         else if(myChar === 'eevee') strokeColor = '#A0522D';
+        else if(myChar === 'alcremie') strokeColor = '#FFB6C1';
+        else if(myChar === 'terapagos') strokeColor = '#87CEEB';
+        else if(myChar === 'charizard') strokeColor = '#FF6B35';
+        else if(myChar === 'jirachi') strokeColor = '#FFD700';
+        else if(myChar === 'riolu') strokeColor = '#4A90E2';
         ctx.strokeStyle = strokeColor; ctx.stroke();
 
         // 刻度
@@ -521,9 +970,25 @@
         const inH = parseInt(document.getElementById('in-hour').value);
         const inM = parseInt(document.getElementById('in-min').value);
         if(isNaN(inH) || isNaN(inM)) return;
+        
+        // 停止倒數計時
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
+            const elapsed = (Date.now() - startTime) / 1000;
+            const secondsLeft = timeLeft;
+            showTimeBonus(secondsLeft);
+        }
+        
         if(inH === curHour && inM === curMin) {
-            generateAttacks(); forcedMistakeType = null;
+            // 答對了！增加連擊
+            comboCount++;
+            updateComboDisplay();
+            generateAttacks(); 
+            forcedMistakeType = null;
         } else {
+            // 答錯了，重置連擊
+            comboCount = 0;
+            updateComboDisplay();
             analyzeError(inH, inM);
         }
     }
@@ -547,6 +1012,9 @@
         }
         document.getElementById('tutorial-text').innerHTML = html;
         document.getElementById('tutorial-overlay').style.display = 'block';
+        // 重置連擊
+        comboCount = 0;
+        updateComboDisplay();
         enemyAttack();
     }
 
@@ -560,6 +1028,7 @@
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('input-controls').style.display = 'block';
         document.getElementById('in-hour').value = ''; document.getElementById('in-min').value = '';
+        // 保持連擊，不重置
         generateQuestion();
     }
 
@@ -569,13 +1038,18 @@
     }
 
     function endGame(win) {
+        if (countdownTimer) clearInterval(countdownTimer);
         document.getElementById('scene-game').classList.add('hidden');
         document.getElementById('end-screen').style.display = 'block';
         const img = document.getElementById('end-img');
         if(win) {
             document.getElementById('end-title').innerText = "🎉 挑戰成功！";
             img.src = IMGS.win; 
-            document.getElementById('end-desc').innerText = "你太厲害了！可達鴨完全被打敗了！";
+            let desc = "你太厲害了！可達鴨完全被打敗了！";
+            if (comboCount >= 5) {
+                desc += `\n🔥 最高連擊：${comboCount}次！你是時鐘大師！`;
+            }
+            document.getElementById('end-desc').innerText = desc;
         } else {
             document.getElementById('end-title').innerText = "😢 挑戰失敗...";
             img.src = IMGS.lose;
